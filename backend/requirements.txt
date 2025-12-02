@@ -1,3 +1,8 @@
 fastapi
 uvicorn[standard]
 python-dotenv
+aiogram>=3.0.0
+httpx
+supabase
+pydantic-settings
+requests

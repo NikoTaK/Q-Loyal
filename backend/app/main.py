@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes import router as api_router
 
+from app.telegram_webhook import router as telegram_router
+
+
 app = FastAPI(title="Q-Loyal API")
 
 app.add_middleware(
@@ -17,3 +20,4 @@ def health():
     return {"status": "ok"}
 
 app.include_router(api_router, prefix="/api")
+app.include_router(telegram_router)

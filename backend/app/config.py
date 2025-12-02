@@ -9,4 +9,6 @@ class Settings(BaseSettings):
     SUPABASE_KEY: str
     SUPABASE_ANON_KEY: str
 
+    TELEGRAM_BOT_TOKEN: str
+
 settings = Settings()
