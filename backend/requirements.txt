@@ -6,3 +6,4 @@ httpx
 supabase
 pydantic-settings
 requests
+qrcode[pil]
