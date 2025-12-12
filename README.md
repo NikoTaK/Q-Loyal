@@ -4,6 +4,25 @@ A loyalty rewards platform that ingests customer transaction data from multiple 
 
 ## Architecture
 
+```mermaid
+sequenceDiagram
+    actor Customer
+    participant Bot as Telegram Bot
+    participant API as Backend API
+    participant DB as Supabase DB
+    autonumber
+
+    Customer ->> Bot: /start
+    Bot ->> API: registerUser(telegram_id, username)
+    API ->> DB: insert/select user
+    DB -->> API: user record
+    API ->> API: generatePersonalQR(customer_id)
+    API ->> DB: store QR metadata
+    DB -->> API: saved
+    API -->> Bot: personal QR image
+    Bot -->> Customer: "Welcome! Here is your personal QR"
+```
+
 ## 1. Elements of the Project
 
 - **Telegram Bot** – main interface for customers, employees, and business owners.
