@@ -4,13 +4,15 @@ A loyalty rewards platform that ingests customer transaction data from multiple 
 
 ## Architecture
 
+
+### Customer Onboarding & Personal QR Creation
 ```mermaid
 sequenceDiagram
+    autonumber
     actor Customer
     participant Bot as Telegram Bot
     participant API as Backend API
     participant DB as Supabase DB
-    autonumber
 
     Customer ->> Bot: /start
     Bot ->> API: registerUser(telegram_id, username)
@@ -20,15 +22,68 @@ sequenceDiagram
     API ->> DB: store QR metadata
     DB -->> API: saved
     API -->> Bot: personal QR image
-    Bot -->> Customer: "Welcome! Here is your personal QR"
+    Bot -->> Customer: Welcome! Here is your personal QR
+```
 
+### Loyalty Card Creation
+```mermaid
 sequenceDiagram
+    autonumber
+    actor Customer
+    actor Merchant as Merchant App
+    participant API as Backend API
+    participant DB as Supabase DB
+
+    Customer ->> Merchant: First visit, shows personal QR
+    Merchant ->> API: scanQR(customer_id, business_id)
+    API ->> DB: check loyalty card (customer,business)
+    DB -->> API: not found
+
+    API ->> DB: create loyalty card (customer_id, business_id)
+    DB -->> API: loyalty card created
+
+    API -->> Merchant: "Loyalty card created"
+    API ->> DB: insert first stamp
+    DB -->> API: stamp saved
+    API -->> Customer: (via Bot) "New loyalty card created. First stamp added!"
+```
+
+### Business Scans Customer QR to Add Stamp
+```mermaid
+ sequenceDiagram
+    autonumber
     actor Customer
     actor Merchant as Merchant App
     participant API as Backend API
     participant DB as Supabase DB
     participant Fraud as Fraud Engine
+
+    Customer ->> Merchant: Show personal QR
+    Merchant ->> API: scanQR(customer_id, business_id)
+    API ->> DB: fetch loyalty card (customer,business)
+    DB -->> API: card or none
+    API ->> Fraud: validateStampRequest(data)
+    Fraud -->> API: valid / rejected
+
+    alt Valid Stamp
+        API ->> DB: insert stamp + upsert card
+        DB -->> API: updated
+        API -->> Merchant: Stamp added
+        API -->> Customer: (via Bot) You received a stamp
+    else Invalid Stamp
+        API -->> Merchant: Stamp rejected
+    end
+```
+
+### Reward Redemption Using Customer QR
+```mermaid
+sequenceDiagram
     autonumber
+    actor Customer
+    actor Merchant as Merchant App
+    participant API as Backend API
+    participant DB as Supabase DB
+    participant Fraud as Fraud Engine
 
     Customer ->> Merchant: Show personal QR
     Merchant ->> API: scanQR(customer_id, business_id, employee_id)
@@ -40,10 +95,10 @@ sequenceDiagram
     alt Valid Stamp
         API ->> DB: insert stamp + upsert card
         DB -->> API: updated
-        API -->> Merchant: "Stamp added"
-        API -->> Customer: (via Bot) "You received a stamp!"
+        API -->> Merchant: Stamp added
+        API -->> Customer: (via Bot) You received a stamp
     else Invalid Stamp
-        API -->> Merchant: "Stamp rejected"
+        API -->> Merchant: Stamp rejected
     end
 ```
 
