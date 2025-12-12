@@ -21,6 +21,30 @@ sequenceDiagram
     DB -->> API: saved
     API -->> Bot: personal QR image
     Bot -->> Customer: "Welcome! Here is your personal QR"
+
+sequenceDiagram
+    actor Customer
+    actor Merchant as Merchant App
+    participant API as Backend API
+    participant DB as Supabase DB
+    participant Fraud as Fraud Engine
+    autonumber
+
+    Customer ->> Merchant: Show personal QR
+    Merchant ->> API: scanQR(customer_id, business_id, employee_id)
+    API ->> DB: fetch loyalty card (customer,business)
+    DB -->> API: card or none
+    API ->> Fraud: validateStampRequest(data)
+    Fraud -->> API: valid / rejected
+
+    alt Valid Stamp
+        API ->> DB: insert stamp + upsert card
+        DB -->> API: updated
+        API -->> Merchant: "Stamp added"
+        API -->> Customer: (via Bot) "You received a stamp!"
+    else Invalid Stamp
+        API -->> Merchant: "Stamp rejected"
+    end
 ```
 
 ## 1. Elements of the Project
