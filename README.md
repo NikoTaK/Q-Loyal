@@ -78,27 +78,25 @@ sequenceDiagram
 ### Reward Redemption Using Customer QR
 ```mermaid
 sequenceDiagram
-    autonumber
     actor Customer
     actor Merchant as Merchant App
     participant API as Backend API
     participant DB as Supabase DB
-    participant Fraud as Fraud Engine
+    autonumber
 
-    Customer ->> Merchant: Show personal QR
-    Merchant ->> API: scanQR(customer_id, business_id, employee_id)
-    API ->> DB: fetch loyalty card (customer,business)
-    DB -->> API: card or none
-    API ->> Fraud: validateStampRequest(data)
-    Fraud -->> API: valid / rejected
+    Customer ->> Merchant: show QR code
+    Merchant ->> API: redeemReward(customer_id, business_id)
+    API ->> DB: fetch loyalty card
+    DB -->> API: card + stamp count
+    API ->> API: check reward eligibility
 
-    alt Valid Stamp
-        API ->> DB: insert stamp + upsert card
+    alt Eligible
+        API ->> DB: mark reward redeemed and deduct stamps
         DB -->> API: updated
-        API -->> Merchant: Stamp added
-        API -->> Customer: (via Bot) You received a stamp
-    else Invalid Stamp
-        API -->> Merchant: Stamp rejected
+        API -->> Merchant: Reward approved
+        API ->> Customer: notify customer
+    else Not Eligible
+        API -->> Merchant: Not enough stamps
     end
 ```
 
