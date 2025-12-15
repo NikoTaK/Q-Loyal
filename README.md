@@ -1,9 +1,59 @@
 # Q-Loyal
 
-A loyalty rewards platform that ingests customer transaction data from multiple merchants, and exposes APIs and dashboards for reward tracking, redemption, and partner management.
+Q-Loyal is a Telegram-based loyalty rewards platform that enables customers to collect digital stamps via QR codes and allows merchants to manage loyalty programs with minimal friction.
 
-## Architecture
+---
 
+## Product Phases Overview
+
+| Phase | Goal |
+|------|-----|
+| **MVP** | Validate core loyalty flow (QR -> stamp -> card) |
+| **Phase I** | Make the product production-ready |
+| **Phase II** | Optimize engagement, analytics, and trust |
+| **Future Phases** | Scale, monetize, and integrate |
+
+---
+
+## Architecture Phase I/II
+
+![Q-Loyal Architecture](Q-Loyal_Arch_Phase1.png)
+
+> This diagram includes **all MVP components plus the minimum additions required for a real-world release**.
+
+### MVP Components
+- Telegram Bot (customer interface)
+- FastAPI Backend
+- Supabase Database (PostgreSQL)
+- QR Code generation & scanning
+- Telegram-based identity (`telegram_id`)
+
+### MVP Capabilities
+- Customer onboarding
+- Personal QR code generation
+- Loyalty card creation
+- Stamp issuance
+- Stamp count tracking
+
+## Phase I — Production Release
+
+Phase I adds **operational safety, role separation, and observability**, while keeping the same core flows.
+
+### Phase I Additions
+- Merchant authentication (Supabase Auth)
+- Role-based access (owner, employee)
+- Web-based merchant dashboard (basic)
+- Validation & rate limiting
+- Logging & monitoring
+- Deployment infrastructure
+
+### Why Phase I Is Needed
+- Prevent abuse
+- Support real merchants
+- Enable debugging & support
+- Prepare for scale
+
+## Core User Flows
 
 ### Customer Onboarding & Personal QR Creation
 ```mermaid
@@ -24,7 +74,6 @@ sequenceDiagram
     API -->> Bot: personal QR image
     Bot -->> Customer: Welcome! Here is your personal QR
 ```
-
 ### Loyalty Card Creation
 ```mermaid
 sequenceDiagram
@@ -47,7 +96,6 @@ sequenceDiagram
     DB -->> API: stamp saved
     API -->> Customer: (via Bot) "New loyalty card created. First stamp added!"
 ```
-
 ### Business Scans Customer QR to Add Stamp
 ```mermaid
  sequenceDiagram
@@ -74,7 +122,6 @@ sequenceDiagram
         API -->> Merchant: Stamp rejected
     end
 ```
-
 ### Reward Redemption Using Customer QR
 ```mermaid
 sequenceDiagram
@@ -99,62 +146,38 @@ sequenceDiagram
         API -->> Merchant: Not enough stamps
     end
 ```
+## Phase II — Optimization & Growth
 
-## 1. Elements of the Project
+Phase II begins **only after real usage data exists**.
 
-- **Telegram Bot** – main interface for customers, employees, and business owners.
-- **FastAPI Backend** – business logic: QR validation, stamp issuance, user & business logic.
-- **Supabase Database** – PostgreSQL + RLS for users, businesses, loyalty cards, stamps.
-- **Supabase Auth** – auth system for business owners (and future web dashboard).
-- **QR Code System** – static & dynamic QR codes for stamp collection and employee stamping.
-- **(Future) Admin Dashboard** – web UI for business management and analytics.
+### Phase II Additions
+- Merchant analytics dashboard
+- Reward catalogs
+- Redemption history
+- Telegram notifications
+- Fraud detection (velocity & behavior-based)
+- Event tracking
 
-## 2. Architectural Patterns
-- **Layered / Clean Architecture**: API layer → service layer → repository layer → DB.
-- **Webhook Integration**: Telegram → FastAPI via webhooks.
-- **Repository Pattern**: DB access abstracted behind repositories.
-- **Stateless API Services**: no server-side sessions; all state in DB.
+### Signals to Enter Phase II
+- Merchants request insights
+- High stamp volume
+- Repeated abuse attempts
+- Drop in reward redemption
 
-## 3. Communication Between Components
+## Future Phases
 
-- **Telegram Bot → FastAPI**  
-  - Via Telegram **webhooks** for messages, commands, and QR scan events.
-- **FastAPI → Supabase**  
-  - Via Supabase client / SQL for CRUD on users, businesses, cards, and stamps.
-- **Dashboard → FastAPI → Supabase** (future)  
-  - Browser calls REST endpoints on FastAPI; backend queries Supabase.
-- **QR Codes → FastAPI**  
-  - QR payload is sent by the Telegram Bot to FastAPI, which validates and applies stamps.
+These features are **intentionally deferred** until strong demand exists.
 
-## 4. Authentication (AuthN) & Authorization (AuthZ)
+| Feature | Why | Trigger |
+|------|----|----|
+| Payments & subscriptions | Monetization | Merchants willing to pay |
+| POS integrations | Scale | Larger merchants |
+| Mobile merchant app | Convenience | Daily usage |
+| ML fraud detection | Trust | High fraud cost |
+| Cross-merchant rewards | Network effects | Dense merchant network |
+| White-label solution | Enterprise | B2B demand |
 
-### Telegram Users (Customers & Employees)
-- **AuthN**
-  - Identified by `telegram_id` (Telegram as identity provider).
-- **AuthZ**
-  - Customers can only view and modify their own loyalty cards.
-  - Employees can issue stamps only for cards belonging to their assigned business.
-
-### Business Owners (Dashboard)
-- **AuthN**
-  - Supabase Auth (email/password or OAuth).
-- **AuthZ**
-  - Can only access and manage businesses where they are the owner.
-  - Can manage employees and view analytics for their own businesses only.
-
-### QR Codes
-- **Static QR**
-  - Encodes `business_id` for simple “add stamp” flows.
-- **Dynamic QR**
-  - Encodes `business_id`, `employee_id`, and a nonce/timestamp to prevent replay.
-- Validation & permissions checks happen in FastAPI.
-
-### Database-Level Enforcement
-- **RLS Policies in Supabase**
-  - Restrict access by:
-    - `telegram_user_id` for customer data (cards, stamps).
-    - `owner_id` for business and analytics data.
-    - `employee_id` and `business_id` for stamp issuance.
+## System Components
 
 **Users**
 
@@ -164,22 +187,14 @@ sequenceDiagram
 
 **Clients**
 
-- Web Dashboard
-- Mobile App
-- Merchant Portal
+- Telegram Bot
+- Web Dashboard (Phase I)
+- Merchant Portal (future)
 
-**Public Services**
+### Architecture Patterns
 
-- Customer API
-- Merchant API + Analytics
-
-**Internal Services**
-
-- Public Auth (Customers & Merchants)
-- Internal Auth (Admins)
-- Reward Calculation Engine
-- Notification Service
-- Reporting Service
-
-**3rd Party Services**
-- Email Service (SendGrid/SES)
+- Layered / Clean Architecture
+- Stateless API services
+- Repository pattern
+- Webhook-based integration (Telegram)
+- Database-enforced authorization (RLS)
