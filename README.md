@@ -198,3 +198,16 @@ These features are **intentionally deferred** until strong demand exists.
 - Repository pattern
 - Webhook-based integration (Telegram)
 - Database-enforced authorization (RLS)
+
+## Architecture & Design
+
+A full professional architecture design package is available here:
+
+📄 [Design_Package.md](./Design_Package.md)
+
+This document covers:
+- Architectural decisions & trade-offs
+- API design
+- Data model & storage
+- Security & authorization
+- Team & scaling strategy

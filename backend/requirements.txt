@@ -1,9 +1,6 @@
-fastapi
-uvicorn[standard]
-python-dotenv
-aiogram>=3.0.0
-httpx
-supabase
-pydantic-settings
-requests
-qrcode[pil]
+pillow
+pyTelegramBotAPI>=4.12.0
+Pillow>=10.0.0
+pyzbar>=0.1.9
+qrcode[pil]>=7.4.2
+python-dotenv>=1.0.0
