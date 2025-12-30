@@ -1,2 +1,11 @@
 /.DS_Store
 /.venv
+Q-Loyal-Bot/__pycache__
+tg_user.db
+qrs
+scans
+Q-Loyal-Bot/db.sqlite3
+Q-Loyal-Bot/app/__pycache__/handlers.cpython-312.pyc
+Q-Loyal-Bot/app/__pycache__/keyboards.cpython-312.pyc
+Q-Loyal-Bot/app/database/__pycache__/models.cpython-312.pyc
+Q-Loyal-Bot/app/database/__pycache__/requests.cpython-312.pyc
