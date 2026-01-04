@@ -13,6 +13,7 @@ class User(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     tg_id = mapped_column(BigInteger)
+    full_name: Mapped[str] = mapped_column(String(255))
     username: Mapped[str] = mapped_column(String(32), nullable=True)
     language_code: Mapped[str] = mapped_column(String(8), nullable=True)
     qr_token: Mapped[str] = mapped_column(String(255), nullable=True)

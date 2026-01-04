@@ -1,4 +1,5 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+from app.strings_customer import get_text
 
 main = ReplyKeyboardMarkup(
     keyboard=[
@@ -8,8 +9,13 @@ main = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-mini_app = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text="Q-Loyal Mini App", web_app=WebAppInfo(url="https://q-loyal.web.app"))],
-    ]
-)
+def main_customer_kb(lang):
+    webapp_url = "https://q-loyal.web.app" 
+    
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text=get_text("open_app", lang), web_app=WebAppInfo(url=webapp_url))],
+            [KeyboardButton(text=get_text("my_qr", lang))]
+        ],
+        resize_keyboard=True
+    )
