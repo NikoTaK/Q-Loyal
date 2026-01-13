@@ -2,8 +2,7 @@
 /.venv
 Q-Loyal-Bot/__pycache__
 tg_user.db
-qrs
-scans
+config.py
 Q-Loyal-Bot/db.sqlite3
 Q-Loyal-Bot/.DS_Store
 Q-Loyal-Bot/app/__pycache__/*
